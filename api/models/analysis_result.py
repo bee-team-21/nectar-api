@@ -7,8 +7,12 @@ class RequestBody(BaseModel):
 class Tag(BaseModel):
     name:str
     score: float
-    flg_animal: Optional[bool] = False
     flg_cage: Optional[bool] = False
+
+class DetectedObjects(BaseModel):
+    name:str
+    confidence:float
+    flg_animal: Optional[bool] = False
 
 class Captions(BaseModel):
     text : str
@@ -22,6 +26,7 @@ class AnalysisResult(BaseModel):
     user_id : str
     image_url: str
     tags:List[Tag]
+    detected_objects : List[DetectedObjects]
     captions:Optional[List[Captions]]
     risk: List[Risk]
     text: str
