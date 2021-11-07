@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Response
 from fastapi.params import Depends
 from api.access import get_api_key
 from api.models.forbidden import Forbidden
-from api.models.analysis_result import AnalysisResult
+from api.models.analysis_result import AnalysisResult, RequestBody
 from api.models.result import Result
 from fastapi.openapi.models import APIKey
 from api.services.cognitive_consult import get_analyze
@@ -19,6 +19,6 @@ router = APIRouter()
         status.HTTP_200_OK: {"model": AnalysisResult},
     },
 )
-async def post_analyze(url:str, user: APIKey = Depends(get_api_key)):
-    res = get_analyze(url,user.get('username'))
+async def post_analyze(url:RequestBody, user: APIKey = Depends(get_api_key)):
+    res = get_analyze(url.url,user.get('username'))
     return res
