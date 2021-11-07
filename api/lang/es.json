@@ -1,0 +1,12 @@
+{
+    "success": {
+        "default": "Acción realizada correctamente",
+        "send_notify": "Se envió  la notificación"
+        
+    },
+    "error": {
+        "default": "Ocurrio un error",
+        "token_no_valid": "Token de acceso no válido",
+        "send_notify": "No se pudo enviar la notificación"
+    }
+}

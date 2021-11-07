@@ -1,0 +1,22 @@
+import os
+GOOGLE_CLIENT_ID = os.getenv('APP_GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.getenv('APP_GOOGLE_CLIENT_SECRET', '')
+SECRET_KEY = os.getenv('APP_SECRET_KEY', '')
+SECRET_KEY_MIDDLEWARE = os.getenv('APP_SECRET_KEY_MIDDLEWARE', '')
+ALGORITHM = os.getenv('APP_ALGORITHM', 'HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('APP_ACCESS_TOKEN_EXPIRE_MINUTES', '30'))
+MONGO_DB = os.environ.get('APP_MONGO_DB', 'db')
+MONGO_URI = os.environ.get('APP_MONGO_URI', 'mongodb://user:password@localhost/db')
+LANG = os.getenv("APP_LANG", "es.json")
+API_KEY_NAME = os.getenv("APP_API_KEY_NAME", "Authorization")
+STATIC_SECRET = os.getenv("APP_STATIC_SECRET", "43e36b7672fadda3df4b158f414ce2b41d2dbb24b639727a1352760bf6133e73")
+NOTIFY_URL = os.getenv("APP_NOTIFY_URL", "http://notify/")
+NOTIFY_TOKEN = os.getenv("APP_NOTIFY_TOKEN", "my_token")
+NOTIFY_SEGMENT = os.getenv("APP_NOTIFY_SEGMENT", "zoohackaton")
+
+APP_VERSION = os.getenv('APP_VERSION', '0.1.0')
+APP_TITLE = os.getenv("APP_TITLE",  "App API")
+APP_DESCRIPTION = os.getenv("APP_DESCRIPTION", "API base to login Bearer using Oauth2 Google")
+
+COGNITIVE_URL = os.getenv('COGNITIVE_URL', 'your cognitive service url')
+COGNITIVE_KEY = os.getenv('COGNITIVE_KEY', 'your cognitive service key')
