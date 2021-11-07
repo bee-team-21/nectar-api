@@ -25,6 +25,7 @@ class AnalysisResult(BaseModel):
     captions:Optional[List[Captions]]
     risk: List[Risk]
     text: str
+    text_en:str
     
 
     

@@ -13,6 +13,9 @@ from api.models.analysis_result import Tag,Captions,Risk,AnalysisResult
 
 from api.configuration import COGNITIVE_KEY, COGNITIVE_URL
 from api.services.token_service import get
+from googletrans import Translator, constants
+
+
 KEY = COGNITIVE_KEY
 ENDPOINT = COGNITIVE_URL
 computervision_client = ComputerVisionClient(ENDPOINT, CognitiveServicesCredentials(KEY))
@@ -83,7 +86,30 @@ def get_risk(tags:List[Tag]):
     return risk_list
 
 def create_message(tags: List[Tag], captions:List[Captions],risk:List[Risk]):
-    return 'Bzzzzz'
+    text = 'Your analisys is done.'
+    for caption in captions:
+        text+= 'The image shows {caption}'.format(caption=caption.text)
+    count_animal=0
+    count_cage = 0
+    count_other = 0
+    for tag in tags:
+        if tag.flg_animal:
+            count_animal+=1
+        if tag.flg_cage:
+            count_cage+=1
+        if not tag.flg_animal and not tag.flg_cage:
+            count_other+=1
+    text+='The image contanins {animals} objects identified as animals, {cages} objects identified as cages and {other} other objects.'.format(animals=count_animal, cages=count_cage,other=count_other)
+    for r in risk:
+        text +="The place is {risk} risk with {confidence}% of confidence.".format(risk= r.grade,confidence=r.confidence*100)
+
+    return text
+
+def tranlate_to_es(text:str):
+    translator = Translator()
+    translation = translator.translate(text, src="en", dest="es")
+    text_es = translation.text 
+    return  text_es 
 
 def get_analyze(url:str, usr_id:str):
     user_id = usr_id
@@ -92,8 +118,10 @@ def get_analyze(url:str, usr_id:str):
     captions=get_captions(url=url)
     print(captions)
     risk=get_risk(tags=tags)
-    message = create_message(tags,captions,risk)
-    analysis= AnalysisResult(user_id = user_id, image_url= image_url,tags= tags,captions = captions,risk=risk, text = message)
+    text_en = create_message(tags,captions,risk)
+    text = tranlate_to_es(text_en)
+
+    analysis= AnalysisResult(user_id = user_id, image_url= image_url,tags= tags,captions = captions,risk=risk, text = text, text_en= text_en)
     return analysis
 
 
