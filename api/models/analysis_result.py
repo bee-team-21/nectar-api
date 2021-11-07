@@ -8,6 +8,7 @@ class Tag(BaseModel):
     name:str
     score: float
     flg_cage: Optional[bool] = False
+    flg_animal: Optional[bool] = False
 
 class DetectedObjects(BaseModel):
     name:str

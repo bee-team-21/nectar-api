@@ -21,12 +21,17 @@ ENDPOINT = COGNITIVE_URL
 computervision_client = ComputerVisionClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 
 def send_taxonomy(name:str):
-    url = "https://rest.ensembl.org/taxonomy/classification/{}".format(name)
-
-    headers = {'Content-type': 'application/json'}
-    response = requests.request("GET", url, headers=headers)
-    if response.status_code == 200:
-        return True
+    to_send = name.split(' ')
+    for name in to_send:
+        dafult_words = ['animal','bird','mamal']
+        if name in dafult_words:
+            return  True
+        url = "https://rest.ensembl.org/taxonomy/classification/{}".format(name)
+        
+        headers = {'Content-type': 'application/json'}
+        response = requests.request("GET", url, headers=headers)
+        if response.status_code == 200:
+            return True
     return False
 
     
@@ -75,7 +80,8 @@ def get_tags(url:str):
         
         for tag in tags_result_remote.tags:
             flg_cage = check_cage(tag.name)
-            t = Tag(name=tag.name,score=tag.confidence, flg_cage=flg_cage)
+            flg_animal = send_taxonomy(tag.name)
+            t = Tag(name=tag.name,score=tag.confidence, flg_cage=flg_cage, flg_animal=flg_animal)
             tag_list.append(t)
     return tag_list
 
@@ -108,25 +114,36 @@ def get_captions(url:str):
             caption_list.append(c)
     return caption_list
 
-def get_risk(tags:List[Tag], detected_objects:List[DetectedObjects]):
+def get_risk(tags:List[Tag], detected_objects:List[DetectedObjects],captions:List[Captions]):
     risk_list= []
-    count_animals = 0
+    count_animals=0
     count_cage = 0
     for tag in tags:
         if tag.flg_cage:
-            count_cage =+1
-    for detected in detected_objects:
-        print(detected.__dict__)
-        if detected.flg_animal:
-            count_animals=+1
+            count_cage+=1
+    for text in captions:
+        if 'cage' in text.text and count_cage == 0:
+            count_cage+=1
+        if 'cages' in text.text and count_cage == 0:
+            count_cage+=1
+    if len(detected_objects) == 1 and detected_objects[0].name == 'empty':
+        for tag in tags:
+            if tag.flg_animal:
+                count_animals+=1
+    else:
+        for detected in detected_objects:
+            if detected.flg_animal:
+                count_animals+=1
+    print(count_animals)
+    print(count_cage)
     if count_animals >2 and count_cage==1:
         risk = Risk(grade = 'High',confidence='0.95')
         risk_list.append(risk)
-    elif count_animals <=2 and count_cage>0:
+    elif count_animals <=2 and count_cage==1:
         risk = Risk(grade = 'High',confidence='0.90')
         risk_list.append(risk)
     elif count_animals ==1 and count_cage==1:
-        risk = Risk(grade = 'Mid',confidence='0.70')
+        risk = Risk(grade = 'Mid',confidence='0.60')
         risk_list.append(risk)
     elif count_animals ==1 and count_cage>1:
         risk = Risk(grade = 'Mid',confidence='0.75')
@@ -145,11 +162,17 @@ def create_message(tags: List[Tag], detected_objects:List[DetectedObjects], capt
     for tag in tags:
         if tag.flg_cage:
             count_cage+=1
-    
-    for detected in detected_objects:
-        if detected.flg_animal:
-            count_animal+=1
-    
+    if 'cage' in text and count_cage == 0:
+        count_cage+=1
+    if len(detected_objects) == 1 and detected_objects[0].name == 'empty':
+        for tag in tags:
+            if tag.flg_animal:
+                count_animal+=1
+    else:
+        for detected in detected_objects:
+            if detected.flg_animal:
+                count_animal+=1
+        
     text+='The image contanins {animals} objects identified as animals, {cages} objects identified as cages.'.format(animals=count_animal, cages=count_cage)
     for r in risk:
         text +="The place is {risk} risk with {confidence}% of confidence.".format(risk= r.grade,confidence=r.confidence*100)
@@ -168,10 +191,9 @@ def get_analyze(url:str, usr_id:str):
     tags = get_tags(url=url)
     detected_objects = get_detect_objects(url=url)
     captions=get_captions(url=url)
-    risk=get_risk(tags=tags,detected_objects=detected_objects)
+    risk=get_risk(tags=tags,detected_objects=detected_objects,captions=captions)
     text_en = create_message(tags,detected_objects,captions,risk)
     text = tranlate_to_es(text_en)
-
     analysis= AnalysisResult(user_id = user_id, image_url= image_url,tags= tags,detected_objects=detected_objects, captions = captions,risk=risk, text = text, text_en= text_en)
     return analysis
 
