@@ -16,6 +16,7 @@ router = APIRouter()
     responses={
         status.HTTP_403_FORBIDDEN: {"model": Forbidden},
         status.HTTP_404_NOT_FOUND: {"model": Result},
+        status.HTTP_200_OK: {"model": AnalysisResult},
     },
 )
 async def post_analyze(url:str, user: APIKey = Depends(get_api_key)):

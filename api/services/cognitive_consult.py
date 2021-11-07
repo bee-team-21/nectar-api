@@ -92,7 +92,8 @@ def get_analyze(url:str, usr_id:str):
     captions=get_captions(url=url)
     print(captions)
     risk=get_risk(tags=tags)
-    analysis= AnalysisResult(user_id = user_id, image_url= image_url,tags= tags,captions = captions,risk=risk)
+    message = create_message(tags,captions,risk)
+    analysis= AnalysisResult(user_id = user_id, image_url= image_url,tags= tags,captions = captions,risk=risk, message = message)
     return analysis
 
 
