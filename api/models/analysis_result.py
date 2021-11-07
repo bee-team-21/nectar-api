@@ -22,6 +22,7 @@ class AnalysisResult(BaseModel):
     tags:List[Tag]
     captions:Optional[List[Captions]]
     risk: List[Risk]
+    text: str
     
 
     

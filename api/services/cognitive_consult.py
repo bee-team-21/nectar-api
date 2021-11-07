@@ -82,6 +82,9 @@ def get_risk(tags:List[Tag]):
         risk_list.append(risk)
     return risk_list
 
+def create_message(tags: List[Tag], captions:List[Captions],risk:List[Risk]):
+    return 'Bzzzzz'
+
 def get_analyze(url:str, usr_id:str):
     user_id = usr_id
     image_url=url
